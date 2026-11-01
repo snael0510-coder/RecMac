@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Convert the approved Design Canvas layouts into static GitHub Pages HTML."""
 from pathlib import Path
+from html import escape
 import hashlib
+import json
 import re
 import shutil
 
@@ -9,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DESIGN = ROOT / 'web-design'
 DOCS = ROOT / 'docs'
 DOWNLOAD_URL = 'https://github.com/snael0510-coder/RecMac/releases/latest/download/RecMac.dmg'
+RELEASES = json.loads((DESIGN / 'releases.json').read_text())
 DOCS.mkdir(exist_ok=True)
 (DOCS / 'ko').mkdir(exist_ok=True)
 shutil.copyfile(DESIGN / 'recmac-logo.svg', DOCS / 'logo.svg')
@@ -48,7 +51,7 @@ for lang, source, target in (
     canvas = canvas.replace('<div style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">',
                             '<div class="rm-demo-toolbar" style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">')
     canvas = canvas.replace('data-action="thanks"', 'data-action="thanks" target="_blank" rel="noopener"')
-    canvas = canvas.replace('[SIZE]', '1 MB').replace('[VERSION]', 'v1.0.1')
+    canvas = canvas.replace('[SIZE]', RELEASES[0]['size']).replace('[VERSION]', RELEASES[0]['version'])
     canvas = canvas.replace('Ko.dc.html', 'ko/').replace('Main.dc.html', '../')
     assert canvas.count('data-action="sendHeart"') == 2
     canvas = canvas.replace(
@@ -165,3 +168,75 @@ for lang, source, target in (
             '</head>\n<body>\n')
     target.write_text(head + canvas + f'\n<script src="{script}" defer></script>\n</body>\n</html>\n')
     print(target.relative_to(ROOT))
+
+
+def version_page(lang):
+    ko = lang == 'ko'
+    title = '버전별 다운로드' if ko else 'Versions & downloads'
+    intro = ('RecMac의 변경 내역과 버전별 설치 파일입니다. 최신 버전 사용을 권장해요.' if ko
+             else 'Release notes and direct downloads for each RecMac version. We recommend the latest release.')
+    back = '← RecMac 홈' if ko else '← RecMac home'
+    download = 'DMG 다운로드' if ko else 'Download DMG'
+    details = 'GitHub 릴리스 보기 ↗' if ko else 'View GitHub release ↗'
+    latest = '최신 버전' if ko else 'Latest'
+    requirements = 'macOS 15 이상 · Apple 실리콘' if ko else 'macOS 15 or later · Apple silicon'
+    path = DOCS / ('ko/versions' if ko else 'versions')
+    path.mkdir(parents=True, exist_ok=True)
+    canonical = f'https://snael0510-coder.github.io/RecMac/{"ko/" if ko else ""}versions/'
+    home = '../'
+    logo_prefix = '../../' if ko else '../'
+    other = '../../versions/' if ko else '../ko/versions/'
+    other_label = 'English' if ko else '한국어'
+    cards = []
+    for index, release in enumerate(RELEASES):
+        version = escape(release['version'])
+        asset_url = f'https://github.com/snael0510-coder/RecMac/releases/download/{version}/RecMac.dmg'
+        release_url = f'https://github.com/snael0510-coder/RecMac/releases/tag/{version}'
+        badge = f'<span class="badge">{latest}</span>' if index == 0 else ''
+        cards.append(f'''<article class="release">
+  <div class="release-heading"><h2>RecMac {version}</h2>{badge}</div>
+  <p class="date">{escape(release['date'])} · {escape(release['size'])}</p>
+  <p>{escape(release[lang])}</p>
+  <div class="actions"><a class="button" href="{asset_url}">{download}</a>
+  <a class="details" href="{release_url}" target="_blank" rel="noopener">{details}</a></div>
+</article>''')
+    content = '\n'.join(cards)
+    page = f'''<!doctype html>
+<html lang="{lang}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{escape(intro)}">
+<link rel="canonical" href="{canonical}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{canonical}">
+<meta property="og:title" content="RecMac — {title}">
+<meta property="og:description" content="{escape(intro)}">
+<meta property="og:image" content="https://snael0510-coder.github.io/RecMac/assets/social-{lang}.jpg">
+<link rel="alternate" hreflang="en" href="https://snael0510-coder.github.io/RecMac/versions/">
+<link rel="alternate" hreflang="ko" href="https://snael0510-coder.github.io/RecMac/ko/versions/">
+<link rel="icon" type="image/svg+xml" href="{logo_prefix}logo.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<title>RecMac — {title}</title>
+<style>
+:root{{font-family:Pretendard,'Pretendard Variable',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:#1d1d1f;background:#fff;-webkit-font-smoothing:antialiased}}
+*{{box-sizing:border-box}}body{{margin:0}}a{{color:inherit}}header{{border-bottom:1px solid #e8e8ed}}nav,main,footer{{max-width:880px;margin:auto;padding-left:1.5rem;padding-right:1.5rem}}
+nav{{min-height:4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}}nav a{{text-decoration:none}}nav .brand{{display:inline-flex;align-items:center;gap:.5rem;font-size:1.125rem;font-weight:700}}nav .brand img{{width:1.5rem;height:1.5rem}}nav .language{{font-size:.875rem;color:#424245}}
+main{{padding-top:5rem;padding-bottom:6rem}}.back{{font-size:.875rem;color:#6e6e73;text-underline-offset:.2em}}h1{{font-size:clamp(2.5rem,6vw,4.25rem);letter-spacing:-.04em;line-height:1.1;margin:1.25rem 0 1rem}}.intro{{color:#6e6e73;font-size:1.0625rem;line-height:1.6;max-width:38rem;margin:0 0 .75rem}}.requirements{{color:#6e6e73;font-size:.875rem;margin:0 0 2.5rem}}
+.release{{border:1px solid #e5e5ea;border-radius:1.25rem;padding:1.75rem;margin-bottom:1rem}}.release-heading{{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}}h2{{margin:0;font-size:1.5rem;letter-spacing:-.025em}}.badge{{background:#e8f2ff;color:#0066cc;border-radius:999px;padding:.3rem .65rem;font-size:.75rem;font-weight:700}}.date{{color:#6e6e73;font-size:.8125rem;margin:.5rem 0 1.25rem}}.release>p:not(.date){{line-height:1.6;margin:0 0 1.5rem}}.actions{{display:flex;align-items:center;gap:1rem 1.5rem;flex-wrap:wrap}}.button{{background:#d70015;color:#fff;border-radius:999px;padding:.8rem 1.2rem;text-decoration:none;font-weight:600}}.button:hover{{background:#b00012}}.details{{color:#424245;font-size:.875rem;text-underline-offset:.2em}}footer{{border-top:1px solid #e8e8ed;padding-top:2rem;padding-bottom:2rem;color:#6e6e73;font-size:.8125rem}}
+</style>
+</head>
+<body>
+<header><nav><a class="brand" href="{home}"><img src="{logo_prefix}logo.svg" alt="">RecMac</a><a class="language" href="{other}" hreflang="{'en' if ko else 'ko'}">{other_label}</a></nav></header>
+<main><a class="back" href="{home}">{back}</a><h1>{title}</h1><p class="intro">{intro}</p><p class="requirements">{requirements}</p>{content}</main>
+<footer>© 2026 KIMMINJAE</footer>
+</body>
+</html>
+'''
+    target = path / 'index.html'
+    target.write_text(page)
+    print(target.relative_to(ROOT))
+
+
+version_page('en')
+version_page('ko')

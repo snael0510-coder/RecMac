@@ -1,0 +1,16 @@
+[
+  {
+    "version": "v1.0.1",
+    "date": "2026-11-01",
+    "size": "1 MB",
+    "en": "The floating toolbar takes up less space, so it no longer blocks clicks outside its visible controls. It expands only when you open advanced options or a notice.",
+    "ko": "하단 녹화 바의 클릭 영역을 줄였습니다. 보이는 버튼 밖의 클릭을 가로막지 않으며, 고급 옵션이나 알림이 필요할 때만 커집니다."
+  },
+  {
+    "version": "v1.0",
+    "date": "2026-11-01",
+    "size": "1 MB",
+    "en": "First public release. Record your screen with Mac system audio.",
+    "ko": "첫 공개 버전입니다. 화면과 Mac 내부 소리를 함께 녹화할 수 있습니다."
+  }
+]
