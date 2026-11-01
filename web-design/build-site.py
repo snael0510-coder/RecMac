@@ -50,6 +50,19 @@ for lang, source, target in (
     canvas = canvas.replace('href="mailto:[YOUR EMAIL]"',
                             'hidden data-support="email" href="#"')
     assert '[YOUR-ID]' not in canvas and '[TOSS-ID]' not in canvas and '[YOUR EMAIL]' not in canvas
+    if lang == 'ko':
+        terminal_note = ('<details style="width:100%;max-width:44rem;text-align:left;color:#424245;font-size:.875rem;line-height:1.6">'
+                         '<summary style="cursor:pointer">터미널 대안</summary>'
+                         '<p>공식 릴리스에서 받은 앱을 응용 프로그램 폴더로 옮긴 뒤에도 열리지 않는 경우:</p>'
+                         '<code style="display:block;overflow-x:auto;padding:.75rem 1rem;background:#f5f5f7;border-radius:.5rem;user-select:all">'
+                         'xattr -dr com.apple.quarantine /Applications/RecMac.app</code></details>')
+    else:
+        terminal_note = ('<details style="width:100%;max-width:44rem;text-align:left;color:#424245;font-size:.875rem;line-height:1.6">'
+                         '<summary style="cursor:pointer">Terminal alternative</summary>'
+                         '<p>If the app from the official release still will not open after moving it to Applications:</p>'
+                         '<code style="display:block;overflow-x:auto;padding:.75rem 1rem;background:#f5f5f7;border-radius:.5rem;user-select:all">'
+                         'xattr -dr com.apple.quarantine /Applications/RecMac.app</code></details>')
+    canvas = canvas.replace('</ol>', '</ol>\n' + terminal_note, 1)
     # Inline design keyframes stay intact, with the approved Pretendard CDN added.
     favicon = 'logo.svg' if lang == 'en' else '../logo.svg'
     script = 'site.js' if lang == 'en' else '../site.js'
