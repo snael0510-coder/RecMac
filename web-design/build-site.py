@@ -7,7 +7,7 @@ import shutil
 ROOT = Path(__file__).resolve().parent.parent
 DESIGN = ROOT / 'web-design'
 DOCS = ROOT / 'docs'
-KAKAO_URL = 'https://qr.kakaopay.com/FdctrGdJx'
+KAKAO_URL = 'https://qr.kakaopay.com/FdctrGdJx1f401718'
 DOCS.mkdir(exist_ok=True)
 (DOCS / 'ko').mkdir(exist_ok=True)
 shutil.copyfile(DESIGN / 'recmac-logo.svg', DOCS / 'logo.svg')
