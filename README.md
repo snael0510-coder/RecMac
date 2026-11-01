@@ -8,7 +8,7 @@ Free macOS screen recorder that captures system audio. Built with Swift and Scre
 
 [Download RecMac.dmg](https://github.com/snael0510-coder/RecMac/releases/latest/download/RecMac.dmg) · [Website](https://snael0510-coder.github.io/RecMac/)
 
-Open the DMG and drag RecMac to Applications. The app uses a local development certificate, so macOS may ask you to confirm opening it in System Settings → Privacy & Security. Allow Screen & System Audio Recording when prompted.
+Open the DMG and drag RecMac to Applications. The app uses a local development certificate. If macOS says “RecMac Not Opened,” click Done, then go to System Settings → Privacy & Security → Open Anyway. Allow Screen & System Audio Recording when prompted.
 
 Recordings are saved in `~/Movies/RecMac/`.
 

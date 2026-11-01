@@ -64,6 +64,40 @@ for lang, source, target in (
     canvas = canvas.replace(
         'RecMac is free and made by one person. If it saves you time, a coffee keeps it going.',
         'RecMac is free and made by one person. If it saves you time, you can support it with Kakao Pay.')
+    canvas = canvas.replace(
+        'max-width: 26rem; box-sizing: border-box; padding: 2.25rem 2rem 1.75rem;',
+        'max-width: 34rem; max-height: calc(100vh - 3rem); overflow-y: auto; box-sizing: border-box; padding: 2rem 2rem 1.75rem;')
+    if lang == 'ko':
+        canvas = canvas.replace('다운로드해 주셔서 고마워요!', '다운로드가 시작됐어요')
+        canvas = canvas.replace('경고가 뜨면 시스템 설정 › 개인정보 보호 및 보안 › ‘그래도 열기’.',
+                                '‘열 수 없음’ 경고에서 ‘완료’를 누른 뒤, 시스템 설정 › 개인정보 보호 및 보안 › ‘그래도 열기’.')
+        warning = '처음 실행할 때 “RecMac을 열 수 없음” 경고가 나타날 수 있어요.'
+        steps = ('<li><strong>1.</strong> 경고창에서 <strong>휴지통으로 이동</strong> 대신 <strong>완료</strong>를 누르세요.</li>'
+                 '<li><strong>2.</strong> <strong>시스템 설정 → 개인정보 보호 및 보안</strong>을 열고 '
+                 '<strong>그래도 열기</strong>를 누르세요.</li>')
+        trust = '공식 GitHub 릴리스에서 받은 앱에만 이 단계를 진행하세요.'
+        apple_url = 'https://support.apple.com/ko-kr/102445'
+        apple_label = 'Apple 안내 보기'
+    else:
+        canvas = canvas.replace('Thanks for downloading!', 'Your download has started')
+        canvas = canvas.replace('If warned, open System Settings › Privacy &amp; Security › Open Anyway.',
+                                'If the warning appears, click Done, then System Settings › Privacy &amp; Security › Open Anyway.')
+        warning = 'On first launch, macOS may say “RecMac Not Opened.”'
+        steps = ('<li><strong>1.</strong> Click <strong>Done</strong>, not Move to Trash.</li>'
+                 '<li><strong>2.</strong> Open <strong>System Settings → Privacy &amp; Security</strong> '
+                 'and click <strong>Open Anyway</strong>.</li>')
+        trust = 'Follow these steps only for the app from the official GitHub release.'
+        apple_url = 'https://support.apple.com/en-us/102445'
+        apple_label = 'Apple’s instructions'
+    guide = (f'<div style="width:100%;text-align:left;background:#f5f5f7;border-radius:1rem;padding:1.1rem 1.25rem;box-sizing:border-box">'
+             f'<p style="margin:0 0 .7rem;font-size:.9375rem;font-weight:600;line-height:1.45">{warning}</p>'
+             f'<ol style="margin:0;padding:0;list-style:none;display:grid;gap:.5rem;font-size:.875rem;line-height:1.5">{steps}</ol>'
+             f'<p style="margin:.85rem 0 0;font-size:.75rem;line-height:1.5;color:#6e6e73">{trust} '
+             f'<a href="{apple_url}" target="_blank" rel="noopener noreferrer">{apple_label} ↗</a></p></div>'
+             '<div style="width:100%;border-top:1px solid #e5e5ea;margin:.25rem 0 0"></div>')
+    canvas, guide_count = re.subn(r'(<h2 id="thanks-title"[^>]*>.*?</h2>)',
+                                  lambda m: m.group(1) + guide, canvas, count=1, flags=re.S)
+    assert guide_count == 1
     canvas = canvas.replace('href="mailto:[YOUR EMAIL]"',
                             'hidden data-support="email" href="#"')
     assert '[YOUR-ID]' not in canvas and '[TOSS-ID]' not in canvas and '[YOUR EMAIL]' not in canvas
