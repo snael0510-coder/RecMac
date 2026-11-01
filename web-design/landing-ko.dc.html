@@ -214,7 +214,7 @@ Mac용 다운로드</a>
 class Component extends DCLogic {
 constructor(props) {
 super(props);
-this.labels = { idle: '맥에서 소리가 나고 있어요', rec: '소리까지 함께 녹화 중', off: '맥 소리 없이 녹화 중' };
+this.labels = { idle: '', rec: '소리까지 함께 녹화 중', off: '맥 소리 없이 녹화 중' };
 this.state = { phase: 'idle', mode: 'window', n: 3, secs: 0, saved: 0, sys: true, mic: false, adv: false, hover: false, showThanks: false };
 }
 componentWillUnmount() { this.clear(); }

@@ -58,7 +58,7 @@
       waveLabel: rec ? (state.systemAudio
         ? (korean ? '맥 소리도 함께 녹화 중' : 'Recording the sound too')
         : (korean ? '맥 소리 없이 녹화 중' : 'Recording without Mac sound'))
-        : (korean ? '맥에서 소리가 재생 중이에요' : 'Your Mac is playing sound'),
+        : '',
       waveLabelColor: rec && state.systemAudio ? '#ff6961' : '#ffffff',
       waveColor: rec && state.systemAudio ? '#ff453a' : 'rgba(255,255,255,0.8)',
       islandW: rec ? (hover ? '17em' : '15.5em') : (state.phase === 'saved' ? '13.5em' : '6.5em'),

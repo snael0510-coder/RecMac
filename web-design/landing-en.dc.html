@@ -212,7 +212,7 @@ Buy me a coffee</a>
 class Component extends DCLogic {
 constructor(props) {
 super(props);
-this.labels = { idle: 'Your Mac is playing sound', rec: 'Recording the sound too', off: 'Recording without Mac sound' };
+this.labels = { idle: '', rec: 'Recording the sound too', off: 'Recording without Mac sound' };
 this.state = { phase: 'idle', mode: 'window', n: 3, secs: 0, saved: 0, sys: true, mic: false, adv: false, hover: false, showThanks: false };
 }
 componentWillUnmount() { this.clear(); }
