@@ -66,9 +66,6 @@ for lang, source, target in (
         '', canvas, flags=re.S)
     assert coffee_count == 2 and toss_count == (2 if lang == 'ko' else 0)
     canvas = canvas.replace(
-        'RecMac은 무료이고, 한 사람이 만들어요. 도움이 됐다면 커피 한 잔으로 응원해 주세요.',
-        'RecMac은 무료이고, 한 사람이 만들어요. 도움이 됐다면 카카오페이로 응원해 주세요.')
-    canvas = canvas.replace(
         'RecMac is free and made by one person. If it saves you time, a coffee keeps it going.',
         'RecMac is free and made by one person. If it saves you time, you can support it with Kakao Pay.')
     canvas = canvas.replace(
