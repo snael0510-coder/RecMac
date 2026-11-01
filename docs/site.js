@@ -1,8 +1,6 @@
 (() => {
   'use strict';
 
-  // Fill these in only with public addresses supplied by the project owner.
-  const support = { coffee: '', toss: '', email: '' };
   const korean = document.documentElement.lang === 'ko';
   const state = {
     phase: 'idle', mode: 'window', count: 3, seconds: 0, saved: 0,
@@ -154,21 +152,6 @@
     if (event.target === event.currentTarget) { state.showThanks = false; render(); }
   });
 
-  const addresses = {
-    coffee: support.coffee ? 'https://buymeacoffee.com/' + support.coffee : '',
-    toss: support.toss ? 'https://toss.me/' + support.toss : '',
-    email: support.email ? 'mailto:' + support.email : ''
-  };
-  document.querySelectorAll('[data-support]').forEach(el => {
-    const href = addresses[el.dataset.support];
-    if (href) { el.href = href; el.hidden = false; }
-  });
-  if (!support.coffee && !support.toss) {
-    const message = document.querySelector('#thanks-title + p');
-    if (message) message.textContent = korean
-      ? 'RecMac을 사용해 주셔서 감사합니다. 녹화가 필요할 때 편하게 써 주세요.'
-      : 'Thanks for trying RecMac. Hope it makes recording easier.';
-  }
   if (!korean && navigator.language?.toLowerCase().startsWith('ko')) {
     const hint = document.createElement('div');
     hint.style.cssText = 'text-align:center;padding:.65rem 1rem;background:#f5f5f7;font:500 .875rem Pretendard,system-ui,sans-serif';
