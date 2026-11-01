@@ -2,10 +2,14 @@
   'use strict';
 
   const korean = document.documentElement.lang === 'ko';
+  const heartEndpoint = 'https://abacus.jasoncameron.dev/hit/snael0510-coder.github.io/recmac-heart';
+  const heartStorageKey = 'recmac-heart-v1';
+  let heartSent = false;
+  try { heartSent = localStorage.getItem(heartStorageKey) === '1'; } catch (_) {}
   const state = {
     phase: 'idle', mode: 'window', count: 3, seconds: 0, saved: 0,
     systemAudio: true, microphone: false, advanced: false, hover: false,
-    showThanks: false
+    showThanks: false, heart: heartSent ? 'sent' : 'ready'
   };
   let timer = null;
   let later = null;
@@ -89,6 +93,13 @@
     const v = values();
     document.querySelectorAll('[data-if]').forEach(el => { el.hidden = !v[el.dataset.if]; });
     document.querySelectorAll('[data-text]').forEach(el => { el.textContent = v[el.dataset.text] ?? ''; });
+    document.querySelectorAll('[data-heart]').forEach(el => {
+      el.disabled = state.heart === 'sending' || state.heart === 'sent';
+      el.textContent = state.heart === 'sent' ? (korean ? '고마워요!' : 'Thank you!') :
+                       state.heart === 'sending' ? (korean ? '전하는 중…' : 'Sending…') :
+                       state.heart === 'error' ? (korean ? '다시 눌러 주세요' : 'Please try again') :
+                       (korean ? '마음 전하기' : 'Send a heart');
+    });
     document.querySelectorAll('[data-bind-style], [data-bind-aria-pressed], [data-bind-fill], [data-bind-stroke], [data-bind-opacity]').forEach(el => {
       for (const [name, template] of Object.entries(el.dataset)) {
         if (!name.startsWith('bind')) continue;
@@ -111,6 +122,19 @@
     hoverOff: () => { state.hover = false; },
     thanks: () => { state.showThanks = true; },
     closeThanks: () => { state.showThanks = false; },
+    sendHeart: async () => {
+      if (state.heart === 'sending' || state.heart === 'sent') return;
+      state.heart = 'sending'; render();
+      try {
+        const response = await fetch(heartEndpoint, { mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer' });
+        if (!response.ok) throw new Error('Heart count failed');
+        try { localStorage.setItem(heartStorageKey, '1'); } catch (_) {}
+        state.heart = 'sent';
+      } catch (_) {
+        state.heart = 'error';
+      }
+      render();
+    },
     start: () => {
       if (state.phase !== 'idle') return;
       clearTimers();

@@ -8,7 +8,6 @@ import shutil
 ROOT = Path(__file__).resolve().parent.parent
 DESIGN = ROOT / 'web-design'
 DOCS = ROOT / 'docs'
-KAKAO_URL = 'https://qr.kakaopay.com/FdctrGdJx1f401718'
 DOWNLOAD_URL = 'https://github.com/snael0510-coder/RecMac/releases/latest/download/RecMac.dmg'
 DOCS.mkdir(exist_ok=True)
 (DOCS / 'ko').mkdir(exist_ok=True)
@@ -51,23 +50,7 @@ for lang, source, target in (
     canvas = canvas.replace('data-action="thanks"', 'data-action="thanks" target="_blank" rel="noopener"')
     canvas = canvas.replace('[SIZE]', '1 MB').replace('[VERSION]', 'v1.0')
     canvas = canvas.replace('Ko.dc.html', 'ko/').replace('Main.dc.html', '../')
-    donation_label = '카카오페이로 후원' if lang == 'ko' else 'Support with Kakao Pay'
-    donation_style = ('text-decoration:none;background:#1d1d1f;color:#ffffff;'
-                      'padding:0 1.125rem;height:2.75rem;border-radius:999px;'
-                      'font-size:.9375rem;font-weight:600;display:inline-flex;'
-                      'align-items:center;justify-content:center')
-    donation_link = (f'<a href="{KAKAO_URL}" target="_blank" rel="noopener noreferrer" '
-                     f'style="{donation_style}">{donation_label}</a>')
-    canvas, coffee_count = re.subn(
-        r'<a href="https://buymeacoffee.com/\[YOUR-ID\]"[^>]*>.*?</a>',
-        donation_link, canvas, flags=re.S)
-    canvas, toss_count = re.subn(
-        r'<a href="https://toss.me/\[TOSS-ID\]"[^>]*>.*?</a>',
-        '', canvas, flags=re.S)
-    assert coffee_count == 2 and toss_count == (2 if lang == 'ko' else 0)
-    canvas = canvas.replace(
-        'RecMac is free and made by one person. If it saves you time, a coffee keeps it going.',
-        'RecMac is free and made by one person. If it saves you time, you can support it with Kakao Pay.')
+    assert canvas.count('data-action="sendHeart"') == 2
     canvas = canvas.replace(
         'max-width: 26rem; box-sizing: border-box; padding: 2.25rem 2rem 1.75rem;',
         'max-width: 34rem; max-height: calc(100vh - 3rem); overflow-y: auto; box-sizing: border-box; padding: 2rem 2rem 1.75rem;')
