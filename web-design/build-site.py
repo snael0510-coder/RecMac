@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Convert the approved Design Canvas layouts into static GitHub Pages HTML."""
 from pathlib import Path
+import hashlib
 import re
 import shutil
 
@@ -39,6 +40,9 @@ for lang, source, target in (
                     lambda m: f'<span data-text="{m.group(1)}"></span>', canvas)
     assert '{{' not in canvas and 'sc-if' not in canvas
     canvas = canvas.replace('[ACCOUNT]', 'snael0510-coder')
+    wallpaper_path = 'assets/wallpaper.jpg' if lang == 'en' else '../assets/wallpaper.jpg'
+    canvas = canvas.replace('background: #141417; overflow: hidden;',
+                            f'background: #082d84 url({wallpaper_path}) center / cover no-repeat; overflow: hidden;')
     canvas = canvas.replace('<div style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">',
                             '<div class="rm-demo-toolbar" style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">')
     canvas = canvas.replace('data-action="thanks"', 'data-action="thanks" target="_blank" rel="noopener"')
@@ -116,7 +120,9 @@ for lang, source, target in (
     canvas = canvas.replace('</ol>', '</ol>\n' + terminal_note, 1)
     # Inline design keyframes stay intact, with the approved Pretendard CDN added.
     favicon = 'logo.svg' if lang == 'en' else '../logo.svg'
-    script = 'site.js' if lang == 'en' else '../site.js'
+    script_path = 'site.js' if lang == 'en' else '../site.js'
+    script_version = hashlib.sha256((DOCS / 'site.js').read_bytes()).hexdigest()[:8]
+    script = f'{script_path}?v={script_version}'
     description = ('Record your Mac screen with system audio. Free for Apple silicon Macs.'
                    if lang == 'en' else '맥 내부 소리까지 함께 녹화하는 무료 macOS 앱. Apple 실리콘용.')
     head = (f'<!doctype html>\n<html lang="{lang}">\n<head>\n<meta charset="utf-8">\n'
