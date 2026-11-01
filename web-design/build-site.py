@@ -48,7 +48,7 @@ for lang, source, target in (
     canvas = canvas.replace('<div style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">',
                             '<div class="rm-demo-toolbar" style="position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%)">')
     canvas = canvas.replace('data-action="thanks"', 'data-action="thanks" target="_blank" rel="noopener"')
-    canvas = canvas.replace('[SIZE]', '1 MB').replace('[VERSION]', 'v1.0')
+    canvas = canvas.replace('[SIZE]', '1 MB').replace('[VERSION]', 'v1.0.1')
     canvas = canvas.replace('Ko.dc.html', 'ko/').replace('Main.dc.html', '../')
     assert canvas.count('data-action="sendHeart"') == 2
     canvas = canvas.replace(

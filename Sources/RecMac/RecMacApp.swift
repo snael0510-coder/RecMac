@@ -62,7 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.regular)
 
-        let size = CGSize(width: 1100, height: 200)
+        let size = toolbarSize()
         let panel = ToolbarPanel(contentRect: NSRect(origin: .zero, size: size),
                                  styleMask: [.borderless, .fullSizeContentView],
                                  backing: .buffered, defer: false)
@@ -74,6 +74,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.isReleasedWhenClosed = false
         panel.hidesOnDeactivate = false
+        toolbar = panel
+        recorder.mainWindow = panel
         panel.contentView = hosting(ToolbarView().environmentObject(recorder))
 
         // 화면 아래쪽 가운데 (스크린샷 툴바 자리)
@@ -83,9 +85,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         panel.alphaValue = 0            // 처음엔 숨겨 두었다가 아래에서 스윽 올라오게
         panel.orderFrontRegardless()
-        toolbar = panel
-
-        recorder.mainWindow = panel
         recorder.openSettings = { [weak self] in self?.showSettings() }
         recorder.statusItemFrame = { [weak self] in self?.statusItem?.button?.window?.frame }
 
@@ -93,6 +92,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         shortcuts.registerAll()
 
         setupStatusItem()
+
+        recorder.$showAdvanced
+            .receive(on: RunLoop.main)
+            .dropFirst()
+            .sink { [weak self] _ in
+                MainActor.assumeIsolated { self?.resizeToolbar() }
+            }
+            .store(in: &cancellables)
+        recorder.$notice
+            .receive(on: RunLoop.main)
+            .dropFirst()
+            .sink { [weak self] _ in
+                MainActor.assumeIsolated { self?.resizeToolbar() }
+            }
+            .store(in: &cancellables)
 
         // 툴바가 앞에 있을 때 ESC → 선택 해제 (한 번 더 누르면 툴바 접기)
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
@@ -112,6 +126,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 if self.recorder.introTick == before { self.recorder.introTick += 1 }   // 첫 실행엔 꼭 한 바퀴
             }
         }
+    }
+
+    /// 투명 패널이 실제 바보다 넓으면 뒤의 앱을 클릭할 수 없으므로 상태별 최소 크기만 쓴다.
+    private func toolbarSize() -> CGSize {
+        CGSize(width: recorder.showAdvanced || recorder.notice != nil ? 910 : 620,
+               height: recorder.notice == nil ? 120 : 170)
+    }
+
+    private func resizeToolbar() {
+        guard let panel = toolbar else { return }
+        let size = toolbarSize()
+        let old = panel.frame
+        guard abs(old.width - size.width) > 1 || abs(old.height - size.height) > 1 else { return }
+        let mouse = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
+            ?? NSScreen.main ?? NSScreen.screens[0]
+        let origin = NSPoint(x: (screen.visibleFrame.midX - size.width / 2).rounded(),
+                             y: screen.visibleFrame.minY + 8)
+        panel.setFrame(NSRect(origin: origin, size: size), display: true)
     }
 
     // MARK: - 메뉴 막대 아이콘 (언제든 불러오기)

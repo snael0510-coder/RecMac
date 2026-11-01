@@ -13,10 +13,11 @@ struct ToolbarView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Spacer(minLength: 0)
             noticeView
             bar
         }
+        .padding(.horizontal, 18)
+        .padding(.top, 44)  // 호버 설명이 바 위로 열릴 공간
         .padding(.bottom, 18)
         .keyframeAnimator(initialValue: FlyValues(), trigger: recorder.flyTick) { content, v in
             content.scaleEffect(x: v.sx, y: v.sy, anchor: .bottom)
